@@ -1,0 +1,24 @@
+{{- if gt (int .Values.replicaCount) 1 }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rauthy-helm.fullname" . }}-hiqlite-headless
+  labels:
+    {{- include "rauthy-helm.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  sessionAffinity: None
+  selector:
+    {{- include "rauthy-helm.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: hiqlite-raft
+      protocol: TCP
+      port: {{ .Values.hiqlite.ports.raft }}
+      targetPort: hiqlite-raft
+    - name: hiqlite-api
+      protocol: TCP
+      port: {{ .Values.hiqlite.ports.api }}
+      targetPort: hiqlite-api
+{{- end }}
